@@ -1,20 +1,16 @@
 import React from "react";
 import Card from "react-bootstrap/Card";
+import { FullTaskInterface } from "../../../../@types/taskTypes";
 
-
-//Full details of a task card displayed within the task model
-const FullTask = ({
+// Full details of a task card displayed within the task model
+const FullTask: React.FC<FullTaskInterface> = ({
   title,
   description,
   owner,
-  status,
-  _id
+  status,  
 }) => {
   return (
-    <Card     
-      style={{ backgroundColor: "#f8f9fa" }}
-      border="dark border-1"
-    >
+    <Card style={{ backgroundColor: "#f8f9fa" }} border="dark border-1">
       <Card.Body>
         <Card.Title>{title}</Card.Title>
         <Card.Text>{description}</Card.Text>

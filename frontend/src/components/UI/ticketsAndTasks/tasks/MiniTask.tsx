@@ -179,8 +179,7 @@ const MiniTask: React.FC<MiniTaskProps> = ({
             title={title}
             description={description}
             owner={owner}
-            status={status}
-            _id={_id}
+            status={status}            
           />
         )}
       </CustomModal>

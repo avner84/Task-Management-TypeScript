@@ -35,3 +35,10 @@ export enum TaskStatus {
     deleteTaskError: string | null;
   }
   
+  export interface FullTaskInterface {   
+    title: string;
+    description: string;
+    owner: string;
+    status: TaskStatus;
+  }
+  

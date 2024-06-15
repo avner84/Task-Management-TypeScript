@@ -1,12 +1,17 @@
-import React, {useState} from "react";
+import React, { useState } from "react";
 import TicketOrBugCard from "../tickets/TicketOrBug";
 import MiniTask from "../tasks/MiniTask";
 import styles from "./TicketsAndTasksRow.module.css";
 import DroppableColumn from "../dargAndDrop/DroppableColumn";
 import useUpdateTask from "../../../../hooks/tasks/useUpdateTask";
 import FloatingAlert from "../../alerts/FloatingAlert";
+import { ITicket, ITask, TaskStatus } from "../../../../@types/ticketTypes";
 
-export default function TicketsAndTasksRow({
+interface TicketsAndTasksRowProps extends ITicket {
+  tasks: ITask[];
+}
+
+const TicketsAndTasksRow: React.FC<TicketsAndTasksRowProps> = ({
   _id,
   title,
   description,
@@ -16,34 +21,33 @@ export default function TicketsAndTasksRow({
   priority,
   type,
   tasks = [], // Ensure tasks is initialized as an empty array if not provided
-}) {
+}) => {
   const { updateTask, updateTaskError } = useUpdateTask();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Handler for drop action in DroppableColumn
-  const handleDrop = async (taskId, columnStatus) => {
-    
+  const handleDrop = async (taskId: string, columnStatus: string) => {
     const task = tasks.find((t) => t._id === taskId);
     if (task && task.status !== columnStatus) {
-      await updateTask(taskId, { status: columnStatus });
+      await updateTask(taskId, { status: columnStatus as TaskStatus });
     }
   };
 
   // Filtering tasks based on their status to organize them in different columns
   const newTasksArray = tasks.filter(
-    (task) => task.ticketId === _id && task.status === "new"
+    (task) => task.ticketId === _id && task.status === TaskStatus.NEW
   );
   const inProgressArray = tasks.filter(
-    (task) => task.ticketId === _id && task.status === "in progress"
+    (task) => task.ticketId === _id && task.status === TaskStatus.IN_PROGRESS
   );
   const doneTasksArray = tasks.filter(
-    (task) => task.ticketId === _id && task.status === "done"
+    (task) => task.ticketId === _id && task.status === TaskStatus.DONE
   );
 
   return (
     <>
       {updateTaskError && !isModalOpen && (
-        <FloatingAlert message={updateTaskError} duration="3000" />
+        <FloatingAlert message={updateTaskError} duration={3000} />
       )}
       <div className={`row py-3 ${styles.fullRowContainer}`}>
         <div className="col-4">
@@ -89,4 +93,6 @@ export default function TicketsAndTasksRow({
       </div>
     </>
   );
-}
+};
+
+export default TicketsAndTasksRow;

@@ -1,13 +1,14 @@
-import React from 'react';
+import React from "react";
+import Main from "./pages/Main";
+import { DndProvider } from "react-dnd";
+import { HTML5Backend } from "react-dnd-html5-backend";
 
-function App() {
+const App: React.FC = () => {
   return (
-    <div className="App">
-      <header className="App-header">
-        <h1>app</h1>
-      
-      </header>
-    </div>
+    <DndProvider backend={HTML5Backend}>
+      {/* DndProvider provides the drag-and-drop context using HTML5Backend for handling the DnD events */}
+      <Main />
+    </DndProvider>
   );
 }
 
