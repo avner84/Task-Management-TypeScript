@@ -9,11 +9,21 @@ import { Trash } from "react-bootstrap-icons";
 import useDeleteTask from "../../../../hooks/tasks/useDeleteTask";
 import useUpdateTask from "../../../../hooks/tasks/useUpdateTask";
 import FloatingAlert from "../../alerts/FloatingAlert";
-import { useDrag } from "react-dnd";
+import { useDrag, DragSourceMonitor } from "react-dnd";
+import { TaskFormData, TaskStatus } from "../../../../@types/taskTypes";
 
-// MiniTask is a small card displaying basic information about a task in a table.
-// When clicked, it shows the full task information, allowing the user to edit or delete the task.
-export default function MiniTask({
+// Define the type for the props
+interface MiniTaskProps {
+  _id: string;
+  ticketId: string;
+  title: string;
+  description: string;
+  owner: string;
+  status: TaskStatus;
+  setIsModalOpen: (isOpen: boolean) => void;
+}
+
+const MiniTask: React.FC<MiniTaskProps> = ({
   _id,
   ticketId,
   title,
@@ -21,15 +31,11 @@ export default function MiniTask({
   owner,
   status,
   setIsModalOpen,
-}) {
+}) => {
   const [showModal, setShowModal] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isEditing, setIsEditing] = useState(false); // State to track if we're in edit mode
-  const {
-    deleteTask,
-    deleteTaskError,
-    resetStatus: resetDeleteTaskStatus,
-  } = useDeleteTask();
+  const { deleteTask, deleteTaskError, resetStatus: resetDeleteTaskStatus } = useDeleteTask();
   const { resetStatus: resetUpdateTaskStatus } = useUpdateTask();
 
   // Handle delete button click
@@ -75,18 +81,17 @@ export default function MiniTask({
   const [{ isDragging }, drag] = useDrag(() => ({
     type: "TASK",
     item: { _id, status },
-    collect: (monitor) => ({
+    collect: (monitor: DragSourceMonitor) => ({
       isDragging: !!monitor.isDragging(),
     }),
   }));
 
-  const initialValues = {
+  const initialValues: TaskFormData = {
     title,
     description,
     owner,
     status,
     ticketId,
-    _id,
   };
 
   // Update modal open state when showModal changes
@@ -126,7 +131,7 @@ export default function MiniTask({
   return (
     <>
       {deleteTaskError && (
-        <FloatingAlert message={deleteTaskError} duration="3000" />
+        <FloatingAlert message={deleteTaskError} duration={3000} />
       )}
       <Card
         ref={drag}
@@ -181,4 +186,6 @@ export default function MiniTask({
       </CustomModal>
     </>
   );
-}
+};
+
+export default MiniTask;
