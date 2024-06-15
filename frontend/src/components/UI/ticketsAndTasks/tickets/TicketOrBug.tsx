@@ -3,14 +3,16 @@ import Card from "react-bootstrap/Card";
 import Button from "react-bootstrap/Button";
 import { Trash } from "react-bootstrap-icons";
 import styles from "./TicketOrBug.module.css";
-import useDeleteTicket from '../../../../hooks/tickets/useDeleteTicket';
-import useAddTask from '../../../../hooks/tasks/useAddTask';
-import useUpdateTicket from '../../../../hooks/tickets/useUpdateTicket';
-import FloatingAlert from '../../alerts/FloatingAlert';
+import useDeleteTicket from "../../../../hooks/tickets/useDeleteTicket";
+import useAddTask from "../../../../hooks/tasks/useAddTask";
+import useUpdateTicket from "../../../../hooks/tickets/useUpdateTicket";
+import FloatingAlert from "../../alerts/FloatingAlert";
 import CustomModal from "../../modal/CustomModal";
 import TicketForm from "../../forms/TicketForm";
 import TaskForm from "../../forms/TaskForm";
 import { format, parseISO } from "date-fns";
+import { TicketType, TicketFormData, TicketStatus, TicketPriority } from "../../../../@types/ticketTypes";
+import { TaskFormData, TaskStatus } from "../../../../@types/taskTypes";
 
 // Define the type for the props
 interface TicketOrBugProps {
@@ -21,7 +23,7 @@ interface TicketOrBugProps {
   dueDate: string;
   status: string;
   priority: string;
-  type: string;
+  type: TicketType; // Use TicketType enum for type
 }
 
 export default function TicketOrBug({
@@ -34,11 +36,9 @@ export default function TicketOrBug({
   priority,
   type,
 }: TicketOrBugProps) {
-  
-
   const [isDeleting, setIsDeleting] = useState(false);
   const [showModal, setShowModal] = useState(false);
-  const [modalFormType, setModalFormType] = useState("");
+  const [modalFormType, setModalFormType] = useState<"Ticket" | "Task">("Ticket");
 
   const { deleteTicketError, deleteTicket } = useDeleteTicket();
   const { resetStatus: resetAddTaskStatus } = useAddTask();
@@ -52,7 +52,7 @@ export default function TicketOrBug({
     deleteTicket(id);
   };
 
-  const handleShow = (formType: string) => {
+  const handleShow = (formType: "Ticket" | "Task") => {
     setModalFormType(formType);
     setShowModal(true);
   };
@@ -69,17 +69,28 @@ export default function TicketOrBug({
   const parseISOdueDate = parseISO(dueDate);
   const formattedDueDate = format(parseISOdueDate, "yyyy-MM-dd");
 
-  const FormComponent = modalFormType === "Ticket" ? TicketForm : TaskForm;
-  const initialValues = modalFormType === "Ticket" 
-    ? { id, title, description, owner, dueDate: formattedDueDate, status, priority }
-    : { title: "", description: "", owner: "", status: "", ticketId: id };
+  const ticketInitialValues: TicketFormData = {
+    title,
+    description,
+    owner,
+    dueDate: formattedDueDate,
+    status: status as TicketStatus,
+    priority: priority as TicketPriority,
+    type,
+  };
+
+  const taskInitialValues: TaskFormData = {
+    title: "",
+    description: "",
+    owner: "",
+    status: TaskStatus.NEW,
+    ticketId: id,
+  };
 
   return (
     <>
       {deleteTicketError && <FloatingAlert message={deleteTicketError} duration={3000} />}
-      <Card
-        className={`${type === "ticket" ? styles.ticketType : styles.bugType}`}
-      >
+      <Card className={`${type === "ticket" ? styles.ticketType : styles.bugType}`}>
         {!isDeleting ? (
           <>
             <Card.Body onClick={() => handleShow("Ticket")} role="button">
@@ -97,16 +108,10 @@ export default function TicketOrBug({
               </Card.Subtitle>
             </Card.Body>
             <Card.Footer className="text-muted d-flex justify-content-between">
-              <Button
-                variant={type === "ticket" ? "primary" : "danger"}
-                onClick={() => handleShow("Task")}
-              >
+              <Button variant={type === "ticket" ? "primary" : "danger"} onClick={() => handleShow("Task")}>
                 Add a Task
               </Button>
-              <div
-                className={`mt-1 ${styles.trashIcon}`}
-                onClick={() => { setIsDeleting(true) }}
-              >
+              <div className={`mt-1 ${styles.trashIcon}`} onClick={() => { setIsDeleting(true) }}>
                 <Trash role="button" size={25} />
               </div>
             </Card.Footer>
@@ -133,7 +138,11 @@ export default function TicketOrBug({
         handleClose={handleClose}
         title={modalFormType === "Ticket" ? `Edit ${capitalizeFirstLetter(type)}` : "Add Task"}
       >
-        <FormComponent formType={type} initialValues={initialValues} isEditMode={modalFormType === "Ticket"} />
+        {modalFormType === "Ticket" ? (
+          <TicketForm formType={type} initialValues={ticketInitialValues} isEditMode={true} />
+        ) : (
+          <TaskForm initialValues={taskInitialValues} isEditMode={false} />
+        )}
       </CustomModal>
     </>
   );
