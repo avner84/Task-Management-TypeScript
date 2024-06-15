@@ -6,19 +6,14 @@ import Button from "react-bootstrap/Button";
 import useAddTicket from "../../../hooks/tickets/useAddTicket";
 import useUpdateTicket from "../../../hooks/tickets/useUpdateTicket";
 import BeatLoader from "react-spinners/BeatLoader";
-import { ITicket, TicketFormData, TicketStatus, TicketPriority, TicketType } from "../../../@types/ticketTypes";
+import { TicketFormData, TicketStatus, TicketPriority, TicketType } from "../../../@types/ticketTypes";
 import { TicketFormProps } from "../../../@types/forms/TicketFormTypes";
 
 const TicketForm: React.FC<TicketFormProps> = ({ formType, initialValues, isEditMode }) => {
-  const { addTicketStatus, addTicketError, addTicket } = useAddTicket(formType as TicketType);
+  const { addTicketStatus, addTicketError, addTicket } = useAddTicket();
   const { updateTicketStatus, updateTicketError, updateTicket } = useUpdateTicket();
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [isChanged, setIsChanged] = useState(false);
-
-  // Function to capitalize the first letter
-  const capitalizeFirstLetter = (string: string) => {
-    return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
-  };
 
   const formik = useFormik<TicketFormData>({
     initialValues: initialValues || {
@@ -28,7 +23,7 @@ const TicketForm: React.FC<TicketFormProps> = ({ formType, initialValues, isEdit
       dueDate: "",
       status: TicketStatus.NEW,
       priority: TicketPriority.MEDIUM,
-      type: formType as TicketPriority,
+      type: formType as TicketType,
     },
     validationSchema: Yup.object({
       title: Yup.string().required("Required"),
@@ -37,10 +32,11 @@ const TicketForm: React.FC<TicketFormProps> = ({ formType, initialValues, isEdit
       dueDate: Yup.date().required("Required"),
       status: Yup.string().required("Required"),
       priority: Yup.string().required("Required"),
+      type: Yup.string().required("Required"),
     }),
     onSubmit: async (values: TicketFormData, { resetForm }: FormikHelpers<TicketFormData>) => {
-      if (isEditMode && initialValues.id) {
-        await updateTicket(initialValues.id, values);
+      if (isEditMode && initialValues && initialValues._id) {
+        await updateTicket(initialValues._id, values);
       } else {
         await addTicket(values);
         resetForm();
@@ -49,14 +45,12 @@ const TicketForm: React.FC<TicketFormProps> = ({ formType, initialValues, isEdit
     enableReinitialize: true,
   });
 
-  // Show success message on successful add or update
   useEffect(() => {
     if (addTicketStatus === "succeeded" || updateTicketStatus === "succeeded") {
       setShowSuccessMessage(true);
     }
   }, [addTicketStatus, updateTicketStatus]);
 
-  // Track if form values have changed
   useEffect(() => {
     const hasChanged = Object.keys(formik.initialValues).some(
       (key) => formik.initialValues[key as keyof TicketFormData] !== formik.values[key as keyof TicketFormData]
@@ -82,7 +76,6 @@ const TicketForm: React.FC<TicketFormProps> = ({ formType, initialValues, isEdit
               <h6>{error}</h6>
             </div>
           )}
-          {/* Title */}
           <Form.Group className="mb-3" controlId="formTitle">
             <Form.Control
               required
@@ -98,7 +91,6 @@ const TicketForm: React.FC<TicketFormProps> = ({ formType, initialValues, isEdit
               {formik.errors.title}
             </Form.Control.Feedback>
           </Form.Group>
-          {/* Description */}
           <Form.Group className="mb-3" controlId="formDescription">
             <Form.Control
               required
@@ -115,7 +107,6 @@ const TicketForm: React.FC<TicketFormProps> = ({ formType, initialValues, isEdit
               {formik.errors.description}
             </Form.Control.Feedback>
           </Form.Group>
-          {/* Owner */}
           <Form.Group className="mb-3" controlId="formOwner">
             <Form.Control
               required
@@ -131,7 +122,6 @@ const TicketForm: React.FC<TicketFormProps> = ({ formType, initialValues, isEdit
               {formik.errors.owner}
             </Form.Control.Feedback>
           </Form.Group>
-          {/* Due Date */}
           <Form.Group className="mb-3" controlId="formDueDate">
             <label htmlFor="dueDate" className="text-muted mb-2 ms-2">
               Due Date:
@@ -149,7 +139,6 @@ const TicketForm: React.FC<TicketFormProps> = ({ formType, initialValues, isEdit
               {formik.errors.dueDate}
             </Form.Control.Feedback>
           </Form.Group>
-          {/* Status */}
           <Form.Group className="mb-3" controlId="formStatus">
             <Form.Select
               required
@@ -169,7 +158,6 @@ const TicketForm: React.FC<TicketFormProps> = ({ formType, initialValues, isEdit
               {formik.errors.status}
             </Form.Control.Feedback>
           </Form.Group>
-          {/* Priority */}
           <Form.Group className="mb-3" controlId="formPriority">
             <Form.Select
               required
@@ -188,7 +176,6 @@ const TicketForm: React.FC<TicketFormProps> = ({ formType, initialValues, isEdit
               {formik.errors.priority}
             </Form.Control.Feedback>
           </Form.Group>
-          {/* Submit Button */}
           <Button
             variant={formType.toLowerCase() === "ticket" ? "primary" : "danger"}
             type="submit"
@@ -203,9 +190,8 @@ const TicketForm: React.FC<TicketFormProps> = ({ formType, initialValues, isEdit
                 data-testid="loader"
               />
             ) : (
-              isEditMode ? `Update ${capitalizeFirstLetter(formType)}` : `Add ${capitalizeFirstLetter(formType)}`
+              isEditMode ? `Update ${formType.charAt(0).toUpperCase() + formType.slice(1)}` : `Add ${formType.charAt(0).toUpperCase() + formType.slice(1)}`
             )}
-            
           </Button>
         </Form>
       )}

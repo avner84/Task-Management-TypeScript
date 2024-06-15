@@ -1,0 +1,15 @@
+.ticketType {
+  background-color: rgba(25, 118, 210, 0.1);
+  border: 2px solid rgb(25, 118, 210);
+}
+
+.bugType {
+  background-color: rgba(217, 83, 79, 0.1);
+  border: 2px solid rgb(217, 83, 79);
+}
+
+.trashIcon :hover{
+  color: red;
+
+}
+

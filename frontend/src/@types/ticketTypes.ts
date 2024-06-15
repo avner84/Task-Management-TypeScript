@@ -1,4 +1,3 @@
-// ticketTypes.ts
 export enum TaskStatus {
   NEW = 'new',
   IN_PROGRESS = 'in progress',
@@ -17,6 +16,7 @@ export enum TicketPriority {
   MEDIUM = 'medium',
   LOW = 'low'
 }
+
 
 export enum TicketType {
   TICKET = 'ticket',
@@ -52,6 +52,14 @@ export interface TicketFormData {
   status: TicketStatus;
   priority: TicketPriority;
   type: TicketType;
+}
+
+export interface TaskFormData {
+  title: string;
+  description: string;
+  owner: string;
+  status: TaskStatus;
+  ticketId: string;
 }
 
 export interface UpdateTicketData {

@@ -4,13 +4,7 @@ import { setStartDate, setEndDate } from "../../../redux/features/dateSelection/
 import DatePicker from "react-datepicker";
 import 'react-datepicker/dist/react-datepicker.css';
 import styles from "./DateSelection.module.css";
-
-interface DateSelectionState {
-  dateSelection: {
-    startDate: string;
-    endDate: string;
-  };
-}
+import { DateSelectionState } from "../../../@types/topBar/dateSelectionTypes";
 
 // DateSelection component is used to set the date range for displaying tickets in the application
 const DateSelection: FC = () => {

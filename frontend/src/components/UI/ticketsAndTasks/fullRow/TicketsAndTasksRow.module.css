@@ -1,0 +1,18 @@
+.fullRowContainer {
+  border-bottom: 1px solid black;
+}
+
+.noTasks {
+  font-size: 2rem;
+  color: gray;
+}
+
+.containerNoTasks {
+  /* border: 1px solid black; */
+  background-color: "#e9ecef";
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

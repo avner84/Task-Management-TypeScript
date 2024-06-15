@@ -1,7 +1,7 @@
-import { TicketFormData } from "../ticketTypes";
+import { TicketFormData, TicketType } from "../../@types/ticketTypes";
 
 export interface TicketFormProps {
-    formType: string;
-    initialValues: TicketFormData & { id?: string }; // Add id to initialValues
-    isEditMode: boolean;
-  }
+  formType: TicketType;
+  initialValues?: TicketFormData & { _id?: string };
+  isEditMode: boolean;
+}
